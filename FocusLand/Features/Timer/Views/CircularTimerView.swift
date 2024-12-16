@@ -11,10 +11,13 @@ struct CircularTimerView: View {
     private let segmentWidth: CGFloat = 2.5
     private let spacing: CGFloat = 2
     
-    private var timeString: String {
+    private var timeString: (minutes: String, seconds: String) {
         let minutes = timeRemaining / 60
         let seconds = timeRemaining % 60
-        return String(format: "%02d\n%02d", minutes, seconds)
+        return (
+            String(format: "%02d", minutes),
+            String(format: "%02d", seconds)
+        )
     }
     
     private var segmentsToFill: Int {
@@ -37,12 +40,16 @@ struct CircularTimerView: View {
             }
             
             // Timer text container
-            VStack(spacing: -5) {
-                Text(timeString)
+            HStack(spacing: 4) {
+                Text(timeString.minutes)
                     .font(.system(size: 50, weight: .light, design: .rounded))
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(timerColor)
+                Text(":")
+                    .font(.system(size: 50, weight: .light, design: .rounded))
+                    .offset(y: -2) // Adjust colon position
+                Text(timeString.seconds)
+                    .font(.system(size: 50, weight: .light, design: .rounded))
             }
+            .foregroundColor(timerColor)
             .rotationEffect(.degrees(90))
         }
         .frame(width: 300, height: 300)

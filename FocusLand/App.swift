@@ -4,6 +4,7 @@ import SwiftData
 @main
 struct FocusApp: App {
     let container: ModelContainer
+    @State private var timerManager = TimerManager()
     
     init() {
         do {
@@ -16,6 +17,7 @@ struct FocusApp: App {
     var body: some Scene {
         WindowGroup {
             MainTabView()
+                .environment(timerManager)
         }
         .modelContainer(container)
     }

@@ -3,24 +3,21 @@ import SwiftData
 
 struct PomodoroTimerView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(TimerManager.self) private var timerManager
     @Query private var settings: [TimerSettings]
     
-    @State private var timeRemaining: Int = 1500
-    @State private var isActive = false
-    @State private var isWorkTime = true
     @State private var showingColorPicker = false
     @State private var showingSettings = false
-    @State private var consecutiveWorkPeriods = 0
     
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     private var progress: Double {
-        let total = isWorkTime ? 
+        let total = timerManager.isWorkTime ? 
             (settings.first?.shortWorkMode == true ? 
                 settings.first?.shortWorkDuration ?? 5 : 
                 settings.first?.workDuration ?? 25) * 60 : 
             settings.first?.breakDuration ?? 5 * 60
-        return Double(total - timeRemaining) / Double(total)
+        return Double(total - timerManager.timeRemaining) / Double(total)
     }
     
     private var timerColor: Color {
@@ -33,12 +30,12 @@ struct PomodoroTimerView: View {
                 CircularTimerView(
                     progress: progress,
                     timerColor: timerColor,
-                    timeRemaining: timeRemaining
+                    timeRemaining: timerManager.timeRemaining
                 )
                 
                 HStack(spacing: 30) {
                     Button(action: toggleTimer) {
-                        Image(systemName: isActive ? "pause.circle.fill" : "play.circle.fill")
+                        Image(systemName: timerManager.isActive ? "pause.circle.fill" : "play.circle.fill")
                             .font(.system(size: 40))
                             .foregroundColor(timerColor)
                     }
@@ -56,8 +53,7 @@ struct PomodoroTimerView: View {
                     }
                 }
                 
-                // Skip break button
-                if !isWorkTime && settings.first?.canSkipBreaks == true {
+                if !timerManager.isWorkTime && settings.first?.canSkipBreaks == true {
                     Button(action: skipBreak) {
                         Text("Skip Break")
                             .foregroundColor(timerColor)
@@ -98,9 +94,9 @@ struct PomodoroTimerView: View {
             )
         }
         .onReceive(timer) { _ in
-            guard isActive else { return }
-            if timeRemaining > 0 {
-                timeRemaining -= 1
+            guard timerManager.isActive else { return }
+            if timerManager.timeRemaining > 0 {
+                timerManager.timeRemaining -= 1
             } else {
                 handleTimerCompletion()
             }
@@ -110,14 +106,28 @@ struct PomodoroTimerView: View {
                 let defaultSettings = TimerSettings()
                 modelContext.insert(defaultSettings)
             }
-            resetTimer()
+            if timerManager.timeRemaining == 0 {
+                resetTimer()
+            }
         }
     }
     
+    private func toggleTimer() {
+        timerManager.isActive.toggle()
+    }
+    
+    private func resetTimer() {
+        timerManager.resetTimer(settings: settings.first)
+    }
+    
+    private func skipBreak() {
+        timerManager.isWorkTime = true
+        resetTimer()
+    }
+    
     private func handleTimerCompletion() {
-        isActive = false
-        if isWorkTime {
-            // Save completed session
+        timerManager.isActive = false
+        if timerManager.isWorkTime {
             let session = FocusSession(
                 duration: (settings.first?.workDuration ?? 25),
                 date: Date(),
@@ -125,32 +135,12 @@ struct PomodoroTimerView: View {
             )
             modelContext.insert(session)
             
-            consecutiveWorkPeriods += 1
-            isWorkTime = false
+            timerManager.consecutiveWorkPeriods += 1
+            timerManager.isWorkTime = false
             resetTimer()
         } else {
-            isWorkTime = true
+            timerManager.isWorkTime = true
             resetTimer()
-        }
-        // Here you could add notifications or sounds
-    }
-    
-    private func skipBreak() {
-        isWorkTime = true
-        resetTimer()
-    }
-    
-    private func toggleTimer() {
-        isActive.toggle()
-    }
-    
-    private func resetTimer() {
-        if isWorkTime {
-            timeRemaining = settings.first?.shortWorkMode == true ? 
-                (settings.first?.shortWorkDuration ?? 5) * 60 : 
-                (settings.first?.workDuration ?? 25) * 60
-        } else {
-            timeRemaining = (settings.first?.breakDuration ?? 5) * 60
         }
     }
     
@@ -160,3 +150,4 @@ struct PomodoroTimerView: View {
         }
     }
 } 
+
