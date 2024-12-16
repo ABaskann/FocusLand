@@ -117,6 +117,14 @@ struct PomodoroTimerView: View {
     private func handleTimerCompletion() {
         isActive = false
         if isWorkTime {
+            // Save completed session
+            let session = FocusSession(
+                duration: (settings.first?.workDuration ?? 25),
+                date: Date(),
+                isCompleted: true
+            )
+            modelContext.insert(session)
+            
             consecutiveWorkPeriods += 1
             isWorkTime = false
             resetTimer()
