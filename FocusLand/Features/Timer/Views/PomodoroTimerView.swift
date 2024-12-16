@@ -28,58 +28,63 @@ struct PomodoroTimerView: View {
     }
     
     var body: some View {
-        VStack {
-            CircularTimerView(
-                progress: progress,
-                timerColor: timerColor,
-                timeRemaining: timeRemaining
-            )
-            
-            // Mode indicator
-//            Text(isWorkTime ? "Work Time" : "Break Time")
-//                .font(.system(size: 16, weight: .medium))
-//                .foregroundColor(timerColor)
-//                .padding(.top, 20)
-            
-            HStack(spacing: 30) {
-                Button(action: toggleTimer) {
-                    Image(systemName: isActive ? "pause.circle.fill" : "play.circle.fill")
-                        .font(.system(size: 40))
-                        .foregroundColor(timerColor)
+        NavigationView {
+            VStack {
+                CircularTimerView(
+                    progress: progress,
+                    timerColor: timerColor,
+                    timeRemaining: timeRemaining
+                )
+                
+                HStack(spacing: 30) {
+                    Button(action: toggleTimer) {
+                        Image(systemName: isActive ? "pause.circle.fill" : "play.circle.fill")
+                            .font(.system(size: 40))
+                            .foregroundColor(timerColor)
+                    }
+                    
+                    Button(action: resetTimer) {
+                        Image(systemName: "arrow.clockwise.circle.fill")
+                            .font(.system(size: 40))
+                            .foregroundColor(timerColor)
+                    }
+                    
+                    Button(action: { showingColorPicker.toggle() }) {
+                        Image(systemName: "paintpalette.fill")
+                            .font(.system(size: 40))
+                            .foregroundColor(timerColor)
+                    }
                 }
                 
-                Button(action: resetTimer) {
-                    Image(systemName: "arrow.clockwise.circle.fill")
-                        .font(.system(size: 40))
-                        .foregroundColor(timerColor)
-                }
-                
-                Button(action: { showingColorPicker.toggle() }) {
-                    Image(systemName: "paintpalette.fill")
-                        .font(.system(size: 40))
-                        .foregroundColor(timerColor)
+                // Skip break button
+                if !isWorkTime && settings.first?.canSkipBreaks == true {
+                    Button(action: skipBreak) {
+                        Text("Skip Break")
+                            .foregroundColor(timerColor)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .stroke(timerColor, lineWidth: 1)
+                            )
+                    }
+                    .padding(.top, 20)
                 }
             }
-            
-            // Skip break button
-            if !isWorkTime && settings.first?.canSkipBreaks == true {
-                Button(action: skipBreak) {
-                    Text("Skip Break")
-                        .foregroundColor(timerColor)
-                        .padding(.vertical, 8)
-                        .padding(.horizontal, 16)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(timerColor, lineWidth: 1)
-                        )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.black)
+            .preferredColorScheme(.dark)
+            .navigationTitle("Focus Timer")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { showingSettings.toggle() }) {
+                        Image(systemName: "gear.circle.fill")
+                            .font(.system(size: 22))
+                            .foregroundColor(timerColor)
+                    }
                 }
-                .padding(.top, 20)
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.black)
-        .preferredColorScheme(.dark)
-        .navigationTitle("Focus Timer")
         .sheet(isPresented: $showingColorPicker) {
             ColorPickerView(selectedColor: Binding(
                 get: { timerColor },
