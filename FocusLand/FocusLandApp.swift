@@ -8,8 +8,10 @@
 import SwiftUI
 import SwiftData
 
+@main
 struct FocusLandApp: App {
     let container: ModelContainer
+    @State private var timerManager = TimerManager()
     
     init() {
         do {
@@ -21,7 +23,8 @@ struct FocusLandApp: App {
     
     var body: some Scene {
         WindowGroup {
-            PomodoroTimerView()
+            MainTabView()
+                .environment(timerManager)
         }
         .modelContainer(container)
     }

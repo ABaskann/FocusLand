@@ -106,6 +106,17 @@ struct HomeView: View {
         return streak
     }
     
+    private var displayedGoals: [Goal] {
+        switch selectedTimeFrame {
+        case 0: // Daily
+            return [todayGoal] // Show only today's goal
+        case 1: // Weekly
+            return goals // Show all goals for the week
+        default:
+            return goals
+        }
+    }
+    
     var body: some View {
         NavigationView {
             ScrollView {
@@ -150,11 +161,21 @@ struct HomeView: View {
                         .padding(.horizontal)
                         
                         // Goals Graph
-                        GoalsGraphView(
-                            goals: goals,
-                            accentColor: accentColor
-                        )
-                        .padding(.horizontal)
+                        if selectedTimeFrame == 0 {
+                            // Daily View
+                            DailyGoalView(
+                                goal: todayGoal,
+                                accentColor: accentColor
+                            )
+                            .padding(.horizontal)
+                        } else {
+                            // Weekly View
+                            GoalsGraphView(
+                                goals: goals,
+                                accentColor: accentColor
+                            )
+                            .padding(.horizontal)
+                        }
                     }
                 }
                 .padding(.vertical)
@@ -198,5 +219,96 @@ struct HomeView: View {
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         HomeView()
+    }
+}
+
+// New DailyGoalView
+struct DailyGoalView: View {
+    let goal: Goal
+    let accentColor: Color
+    
+    private var progress: Double {
+        min(goal.progress, 1.0)
+    }
+    
+    var body: some View {
+        VStack(spacing: 16) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(goal.title)
+                        .font(.headline)
+                    Text(String(format: "%.1f of %.1f hours", goal.completedHours, goal.targetHours))
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                }
+                
+                Spacer()
+                
+                Text(String(format: "%.0f%%", progress * 100))
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(accentColor)
+            }
+            
+            // Progress Bar
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    Rectangle()
+                        .fill(accentColor.opacity(0.2))
+                        .frame(height: 8)
+                        .cornerRadius(4)
+                    
+                    Rectangle()
+                        .fill(accentColor)
+                        .frame(width: geometry.size.width * progress, height: 8)
+                        .cornerRadius(4)
+                }
+            }
+            .frame(height: 8)
+            
+            // Status Message
+            HStack {
+                Image(systemName: getStatusIcon())
+                    .foregroundColor(getStatusColor())
+                Text(getStatusMessage())
+                    .font(.caption)
+                    .foregroundColor(getStatusColor())
+            }
+        }
+        .padding()
+        .background(Color.black.opacity(0.3))
+        .cornerRadius(15)
+    }
+    
+    private func getStatusIcon() -> String {
+        if progress >= 1.0 {
+            return "checkmark.circle.fill"
+        } else if progress >= 0.5 {
+            return "arrow.up.circle.fill"
+        } else {
+            return "arrow.right.circle.fill"
+        }
+    }
+    
+    private func getStatusColor() -> Color {
+        if progress >= 1.0 {
+            return .green
+        } else if progress >= 0.5 {
+            return accentColor
+        } else {
+            return .gray
+        }
+    }
+    
+    private func getStatusMessage() -> String {
+        if progress >= 1.0 {
+            return "Goal completed!"
+        } else if progress >= 0.5 {
+            return "More than halfway there!"
+        } else if progress > 0 {
+            return "Keep going!"
+        } else {
+            return "Start your focus session!"
+        }
     }
 } 
