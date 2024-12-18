@@ -15,7 +15,7 @@ struct FocusLandApp: App {
     
     init() {
         do {
-            container = try ModelContainer(for: TimerSettings.self)
+            container = try ModelContainer(for: TimerSettings.self, FocusSession.self)
         } catch {
             fatalError("Failed to initialize Swift Data container")
         }
