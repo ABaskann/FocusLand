@@ -182,7 +182,7 @@ struct ProfileView: View {
                 .padding(.vertical)
             }
             .background(Color.black)
-            .navigationTitle("Profile")
+//            .navigationTitle("Profile")
             .preferredColorScheme(.dark)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {

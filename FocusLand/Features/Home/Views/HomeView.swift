@@ -181,7 +181,7 @@ struct HomeView: View {
                 .padding(.vertical)
             }
             .background(Color.black)
-            .navigationTitle("Focus")
+//            .navigationTitle("Focus")
             .preferredColorScheme(.dark)
             .onAppear {
                 if settings.isEmpty {

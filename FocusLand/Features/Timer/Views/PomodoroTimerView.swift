@@ -70,7 +70,6 @@ struct PomodoroTimerView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.black)
             .preferredColorScheme(.dark)
-            .navigationTitle("Focus Timer")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showingSettings.toggle() }) {
