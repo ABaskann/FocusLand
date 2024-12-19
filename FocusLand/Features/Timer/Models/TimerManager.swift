@@ -7,60 +7,22 @@ class TimerManager {
     var isActive: Bool = false
     var isWorkTime: Bool = true
     var consecutiveWorkPeriods: Int = 0
-    var isLongBreak: Bool = false
-    
-    private let haptics = UINotificationFeedbackGenerator()
-    private let selectionHaptics = UISelectionFeedbackGenerator()
     
     init(initialTime: Int = 1500) {
         self.timeRemaining = initialTime
-        haptics.prepare()
-        selectionHaptics.prepare()
-    }
-    
-    func toggleTimer(settings: TimerSettings?) {
-        isActive.toggle()
-        selectionHaptics.selectionChanged()
     }
     
     func resetTimer(settings: TimerSettings?) {
         if isWorkTime {
-            timeRemaining = settings?.shortWorkMode == true ? 
-                (settings?.shortWorkDuration ?? 5) * 60 : 
-                (settings?.workDuration ?? 25) * 60
+            timeRemaining = (settings?.workDuration ?? 25) * 60
         } else {
-            if consecutiveWorkPeriods >= 4 {
-                timeRemaining = 15 * 60
-                isLongBreak = true
+            // If we've completed enough work periods, use long break duration
+            if consecutiveWorkPeriods >= (settings?.pomodorosBeforeLongBreak ?? 4) {
+                timeRemaining = (settings?.longBreakDuration ?? 15) * 60
+                consecutiveWorkPeriods = 0  // Reset the counter after a long break
             } else {
-                timeRemaining = (settings?.breakDuration ?? 5) * 60
-                isLongBreak = false
+                timeRemaining = (settings?.shortBreakDuration ?? 5) * 60
             }
-        }
-        
-        // Haptic feedback for session change
-        haptics.notificationOccurred(.success)
-    }
-    
-    func sessionCompleted(settings: TimerSettings?) {
-        haptics.notificationOccurred(.success)
-        
-        if isWorkTime {
-            consecutiveWorkPeriods += 1
-        }
-        
-        if isLongBreak && !isWorkTime {
-            consecutiveWorkPeriods = 0
-        }
-        
-        isWorkTime.toggle()
-        
-        if settings?.autoStartNextSession == true {
-            resetTimer(settings: settings)
-            isActive = true
-        } else {
-            isActive = false
-            resetTimer(settings: settings)
         }
     }
 } 

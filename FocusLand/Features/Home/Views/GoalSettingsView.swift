@@ -7,7 +7,7 @@ struct GoalSettingsView: View {
     @Bindable var settings: TimerSettings
     let accentColor: Color
     
-    @State private var selectedGoalHours: Double
+    @State private var selectedGoalPomodoros: Int
     @State private var selectedDays = Set<Int>()
     @State private var showAlert = false
     
@@ -16,8 +16,7 @@ struct GoalSettingsView: View {
     init(settings: TimerSettings, accentColor: Color) {
         self.settings = settings
         self.accentColor = accentColor
-        _selectedGoalHours = State(initialValue: settings.dailyGoalHours)
-        // Initialize selected days from current settings
+        _selectedGoalPomodoros = State(initialValue: settings.dailyGoalPomodoros)
         _selectedDays = State(initialValue: Set(settings.activeDays))
     }
     
@@ -26,10 +25,13 @@ struct GoalSettingsView: View {
             Form {
                 Section("Daily Goal") {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Target Hours: \(selectedGoalHours, specifier: "%.1f")")
+                        Text("Target Pomodoros: \(selectedGoalPomodoros)")
                             .foregroundColor(accentColor)
                         
-                        Slider(value: $selectedGoalHours, in: 1...12, step: 0.5)
+                        Slider(value: .init(
+                            get: { Double(selectedGoalPomodoros) },
+                            set: { selectedGoalPomodoros = Int($0) }
+                        ), in: 1...16, step: 1)
                             .tint(accentColor)
                     }
                     .padding(.vertical, 8)
@@ -39,9 +41,9 @@ struct GoalSettingsView: View {
                             .foregroundColor(.gray)
                         
                         HStack(spacing: 12) {
-                            ForEach([4, 6, 8], id: \.self) { hours in
-                                Button(action: { selectedGoalHours = Double(hours) }) {
-                                    Text("\(hours) hours")
+                            ForEach([8, 10, 12], id: \.self) { pomodoros in
+                                Button(action: { selectedGoalPomodoros = pomodoros }) {
+                                    Text("\(pomodoros) pomodoros")
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 8)
                                         .background(
@@ -49,7 +51,7 @@ struct GoalSettingsView: View {
                                                 .stroke(accentColor, lineWidth: 1)
                                         )
                                         .background(
-                                            selectedGoalHours == Double(hours) ?
+                                            selectedGoalPomodoros == pomodoros ?
                                                 accentColor.opacity(0.2) :
                                                 Color.clear
                                         )
@@ -150,7 +152,7 @@ struct GoalSettingsView: View {
     }
     
     private func saveSettings() {
-        settings.dailyGoalHours = selectedGoalHours
+        settings.dailyGoalPomodoros = selectedGoalPomodoros
         settings.activeDays = Array(selectedDays).sorted()
         
         do {
@@ -162,7 +164,6 @@ struct GoalSettingsView: View {
     }
     
     private func resetProgress() {
-        // Now we can implement the reset functionality
         let fetchDescriptor = FetchDescriptor<FocusSession>()
         if let sessions = try? modelContext.fetch(fetchDescriptor) {
             sessions.forEach { modelContext.delete($0) }

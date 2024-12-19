@@ -12,11 +12,13 @@ struct PomodoroTimerView: View {
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     private var progress: Double {
-        let total = timerManager.isWorkTime ? 
-            (settings.first?.shortWorkMode == true ? 
-                settings.first?.shortWorkDuration ?? 5 : 
-                settings.first?.workDuration ?? 25) * 60 : 
-            settings.first?.breakDuration ?? 5 * 60
+        let total = if timerManager.isWorkTime {
+            (settings.first?.workDuration ?? 25) * 60
+        } else if timerManager.consecutiveWorkPeriods >= (settings.first?.pomodorosBeforeLongBreak ?? 4) {
+            (settings.first?.longBreakDuration ?? 15) * 60
+        } else {
+            (settings.first?.shortBreakDuration ?? 5) * 60
+        }
         return Double(total - timerManager.timeRemaining) / Double(total)
     }
     
@@ -27,6 +29,14 @@ struct PomodoroTimerView: View {
     var body: some View {
         NavigationView {
             VStack {
+                SessionIndicatorView(
+                    currentPomodoro: timerManager.consecutiveWorkPeriods,
+                    totalPomodoros: settings.first?.pomodorosBeforeLongBreak ?? 4,
+                    isWorkTime: timerManager.isWorkTime,
+                    accentColor: timerColor
+                )
+                .padding(.top)
+                
                 CircularTimerView(
                     progress: progress,
                     timerColor: timerColor,
@@ -53,23 +63,12 @@ struct PomodoroTimerView: View {
                     }
                 }
                 
-                if !timerManager.isWorkTime && settings.first?.canSkipBreaks == true {
-                    Button(action: skipBreak) {
-                        Text("Skip Break")
-                            .foregroundColor(timerColor)
-                            .padding(.vertical, 8)
-                            .padding(.horizontal, 16)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20)
-                                    .stroke(timerColor, lineWidth: 1)
-                            )
-                    }
-                    .padding(.top, 20)
-                }
+                // Removed skip break button since it's not part of the Pomodoro technique
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.black)
             .preferredColorScheme(.dark)
+            .navigationTitle(timerTitle)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showingSettings.toggle() }) {
@@ -111,17 +110,22 @@ struct PomodoroTimerView: View {
         }
     }
     
+    private var timerTitle: String {
+        if timerManager.isWorkTime {
+            return "Pomodoro \(timerManager.consecutiveWorkPeriods + 1)"
+        } else if timerManager.consecutiveWorkPeriods >= (settings.first?.pomodorosBeforeLongBreak ?? 4) {
+            return "Long Break"
+        } else {
+            return "Short Break"
+        }
+    }
+    
     private func toggleTimer() {
         timerManager.isActive.toggle()
     }
     
     private func resetTimer() {
         timerManager.resetTimer(settings: settings.first)
-    }
-    
-    private func skipBreak() {
-        timerManager.isWorkTime = true
-        resetTimer()
     }
     
     private func handleTimerCompletion() {

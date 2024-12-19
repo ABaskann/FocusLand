@@ -14,7 +14,7 @@ struct ProfileView: View {
     private var goals: [Goal] {
         let calendar = Calendar.current
         let today = Date()
-        let dailyGoal = settings.first?.dailyGoalHours ?? 4.0
+        let dailyGoal = Double(settings.first?.dailyGoalPomodoros ?? 8)
         let activeDays = settings.first?.activeDays ?? Array(1...5)
         
         return (0..<7).map { dayOffset in
@@ -45,7 +45,7 @@ struct ProfileView: View {
         goals.last ?? Goal(
             id: UUID(),
             title: "Today",
-            targetHours: settings.first?.dailyGoalHours ?? 4.0,
+            targetHours: Double(settings.first?.dailyGoalPomodoros ?? 8),
             completedMinutes: 0,
             date: Date()
         )
@@ -182,7 +182,7 @@ struct ProfileView: View {
                 .padding(.vertical)
             }
             .background(Color.black)
-//            .navigationTitle("Profile")
+            .navigationTitle("Profile")
             .preferredColorScheme(.dark)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {

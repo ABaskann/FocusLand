@@ -19,7 +19,7 @@ struct HomeView: View {
     private var goals: [Goal] {
         let calendar = Calendar.current
         let today = Date()
-        let dailyGoal = settings.first?.dailyGoalHours ?? 4.0
+        let dailyGoal = Double(settings.first?.dailyGoalPomodoros ?? 8) * 25.0 / 60.0
         let activeDays = settings.first?.activeDays ?? Array(1...5)
         
         return (0..<7).map { dayOffset in
@@ -27,7 +27,7 @@ struct HomeView: View {
             let dayStart = calendar.startOfDay(for: date)
             let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart)!
             
-            let weekday = calendar.component(.weekday, from: date) - 1 // 0-based index
+            let weekday = calendar.component(.weekday, from: date) - 1
             let isActiveDay = activeDays.contains(weekday)
             
             let daysSessions = focusSessions.filter { session in
@@ -39,7 +39,7 @@ struct HomeView: View {
             return Goal(
                 id: UUID(),
                 title: dayName(for: date),
-                targetHours: isActiveDay ? dailyGoal : 0, // Only set target for active days
+                targetHours: isActiveDay ? dailyGoal : 0,
                 completedMinutes: completedMinutes,
                 date: date
             )
@@ -56,7 +56,7 @@ struct HomeView: View {
         goals.last ?? Goal(
             id: UUID(),
             title: "Today",
-            targetHours: settings.first?.dailyGoalHours ?? 4.0,
+            targetHours: Double(settings.first?.dailyGoalPomodoros ?? 8) * 25.0 / 60.0,
             completedMinutes: 0,
             date: Date()
         )
@@ -181,7 +181,7 @@ struct HomeView: View {
                 .padding(.vertical)
             }
             .background(Color.black)
-//            .navigationTitle("Focus")
+            .navigationTitle("Focus")
             .preferredColorScheme(.dark)
             .onAppear {
                 if settings.isEmpty {

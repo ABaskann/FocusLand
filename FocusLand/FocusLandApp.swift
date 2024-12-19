@@ -16,8 +16,6 @@ struct FocusLandApp: App {
     init() {
         do {
             container = try ModelContainer(for: TimerSettings.self, FocusSession.self)
-            // Request notification permissions
-            NotificationManager.shared.requestAuthorization()
         } catch {
             fatalError("Failed to initialize Swift Data container")
         }
