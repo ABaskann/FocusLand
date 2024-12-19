@@ -68,7 +68,7 @@ struct PomodoroTimerView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.black)
             .preferredColorScheme(.dark)
-            .navigationTitle(timerTitle)
+//            .navigationTitle(timerTitle)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showingSettings.toggle() }) {
