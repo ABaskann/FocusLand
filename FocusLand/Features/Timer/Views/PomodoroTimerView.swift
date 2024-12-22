@@ -68,6 +68,12 @@ struct PomodoroTimerView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.black)
             .preferredColorScheme(.dark)
+            .onChange(of: timerManager.isActive) { _, isActive in
+                UIApplication.shared.isIdleTimerDisabled = isActive
+            }
+            .onDisappear {
+                UIApplication.shared.isIdleTimerDisabled = false
+            }
 //            .navigationTitle(timerTitle)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -122,6 +128,7 @@ struct PomodoroTimerView: View {
     
     private func toggleTimer() {
         timerManager.isActive.toggle()
+        UIApplication.shared.isIdleTimerDisabled = timerManager.isActive
     }
     
     private func resetTimer() {
