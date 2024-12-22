@@ -11,6 +11,11 @@ struct PomodoroTimerView: View {
     
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
+    private let softHaptic = UIImpactFeedbackGenerator(style: .soft)
+    private let mediumHaptic = UIImpactFeedbackGenerator(style: .medium)
+    private let rigidHaptic = UIImpactFeedbackGenerator(style: .rigid)
+    private let notificationHaptic = UINotificationFeedbackGenerator()
+    
     private var progress: Double {
         let total = if timerManager.isWorkTime {
             (settings.first?.workDuration ?? 25) * 60
@@ -129,15 +134,19 @@ struct PomodoroTimerView: View {
     private func toggleTimer() {
         timerManager.isActive.toggle()
         UIApplication.shared.isIdleTimerDisabled = timerManager.isActive
+        softHaptic.impactOccurred()
     }
     
     private func resetTimer() {
         timerManager.resetTimer(settings: settings.first)
+        mediumHaptic.impactOccurred()
     }
     
     private func handleTimerCompletion() {
         timerManager.isActive = false
         if timerManager.isWorkTime {
+            notificationHaptic.notificationOccurred(.success)
+            
             let session = FocusSession(
                 duration: (settings.first?.workDuration ?? 25),
                 date: Date(),
@@ -149,6 +158,8 @@ struct PomodoroTimerView: View {
             timerManager.isWorkTime = false
             resetTimer()
         } else {
+            rigidHaptic.impactOccurred()
+            
             timerManager.isWorkTime = true
             resetTimer()
         }
