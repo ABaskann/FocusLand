@@ -33,7 +33,10 @@ struct FocusLandApp: App {
         WindowGroup {
             MainTabView()
                 .environment(timerManager)
+                .modelContainer(container)
+                .onOpenURL { url in
+                    SpotifyService.shared.handleCallback(url)
+                }
         }
-        .modelContainer(container)
     }
 }

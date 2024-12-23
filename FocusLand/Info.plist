@@ -4,6 +4,13 @@
 <dict>
 	<key>   Privacy - Notification Usage Description</key>
 	<string>We'll notify you when your focus sessions end and send daily reminders to help you stay on track</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.app.FocusLand</string>
+		</dict>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
