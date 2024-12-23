@@ -10,6 +10,12 @@ class TimerSettings {
     var selectedColor: String
     var dailyGoalPomodoros: Int
     var activeDays: [Int]
+    var isNotificationsEnabled: Bool
+    var isTimerCompletionEnabled: Bool
+    var isDailyReminderEnabled: Bool
+    var isDailyGoalEnabled: Bool
+    var isStreakEnabled: Bool
+    var dailyReminderTime: Date
     
     init(workDuration: Int = 25, 
          shortBreakDuration: Int = 5,
@@ -25,5 +31,11 @@ class TimerSettings {
         self.selectedColor = selectedColor
         self.dailyGoalPomodoros = dailyGoalPomodoros
         self.activeDays = activeDays
+        self.isNotificationsEnabled = false
+        self.isTimerCompletionEnabled = true
+        self.isDailyReminderEnabled = false
+        self.isDailyGoalEnabled = true
+        self.isStreakEnabled = true
+        self.dailyReminderTime = Calendar.current.date(from: DateComponents(hour: 9, minute: 0)) ?? Date()
     }
 } 

@@ -147,6 +147,10 @@ struct PomodoroTimerView: View {
         if timerManager.isWorkTime {
             notificationHaptic.notificationOccurred(.success)
             
+            if settings.first?.isTimerCompletionEnabled ?? false {
+                scheduleCompletionNotification(isWorkTime: true)
+            }
+            
             let session = FocusSession(
                 duration: (settings.first?.workDuration ?? 25),
                 date: Date(),
@@ -160,9 +164,29 @@ struct PomodoroTimerView: View {
         } else {
             rigidHaptic.impactOccurred()
             
+            if settings.first?.isTimerCompletionEnabled ?? false {
+                scheduleCompletionNotification(isWorkTime: false)
+            }
+            
             timerManager.isWorkTime = true
             resetTimer()
         }
+    }
+    
+    private func scheduleCompletionNotification(isWorkTime: Bool) {
+        let content = UNMutableNotificationContent()
+        content.title = isWorkTime ? "Focus Session Complete! 🎉" : "Break Time Over!"
+        content.body = isWorkTime ? "Time for a well-deserved break." : "Ready to focus again?"
+        content.sound = .default
+        
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        let request = UNNotificationRequest(
+            identifier: UUID().uuidString,
+            content: content,
+            trigger: trigger
+        )
+        
+        UNUserNotificationCenter.current().add(request)
     }
     
     private func updateTimerColor(to color: Color) {

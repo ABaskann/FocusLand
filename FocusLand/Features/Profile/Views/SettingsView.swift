@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UserNotifications
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
@@ -42,15 +43,11 @@ struct SettingsView: View {
                 }
                 
                 Section("App Settings") {
-                    NavigationLink {
-                        GoalSettingsView(settings: settings, accentColor: Color(hex: settings.selectedColor) ?? .orange)
-                    } label: {
+                    NavigationLink(destination: GoalSettingsView(settings: settings, accentColor: Color(hex: settings.selectedColor) ?? .orange)) {
                         Label("Focus Goals", systemImage: "target")
                     }
                     
-                    NavigationLink {
-                        NotificationSettingsView()
-                    } label: {
+                    NavigationLink(destination: NotificationSettingsView(settings: settings)) {
                         Label("Notifications", systemImage: "bell")
                     }
                 }
@@ -120,20 +117,112 @@ struct ThemeButton: View {
 }
 
 struct NotificationSettingsView: View {
-    @AppStorage("notificationsEnabled") private var notificationsEnabled = false
+    @Environment(\.modelContext) private var modelContext
+    @Bindable var settings: TimerSettings
+    @State private var showingTimePicker = false
     
     var body: some View {
         Form {
             Section {
-                Toggle("Enable Notifications", isOn: $notificationsEnabled)
+                Toggle("Enable Notifications", isOn: $settings.isNotificationsEnabled)
+            } footer: {
+                Text("Control all notification settings for FocusLand")
+            }
+            
+            if settings.isNotificationsEnabled {
+                Section {
+                    Toggle("Session Completion", isOn: $settings.isTimerCompletionEnabled)
+                        .onChange(of: settings.isTimerCompletionEnabled) { _, isEnabled in
+                            if isEnabled {
+                                requestTimerNotificationPermission()
+                            }
+                        }
+                    
+                    Toggle("Daily Reminder", isOn: $settings.isDailyReminderEnabled)
+                        .onChange(of: settings.isDailyReminderEnabled) { _, isEnabled in
+                            if isEnabled {
+                                showingTimePicker = true
+                                scheduleDailyReminder()
+                            } else {
+                                cancelDailyReminder()
+                            }
+                        }
+                    
+                    if settings.isDailyReminderEnabled {
+                        DatePicker(
+                            "Reminder Time",
+                            selection: $settings.dailyReminderTime,
+                            displayedComponents: .hourAndMinute
+                        )
+                        .onChange(of: settings.dailyReminderTime) { _, _ in
+                            scheduleDailyReminder()
+                        }
+                    }
+                } header: {
+                    Text("Timer Notifications")
+                } footer: {
+                    Text("Get notified when your focus sessions end and receive daily reminders to stay on track")
+                }
                 
-                if notificationsEnabled {
-                    Toggle("Goal Reminders", isOn: .constant(true))
-                    Toggle("Achievement Alerts", isOn: .constant(true))
-                    Toggle("Daily Summary", isOn: .constant(true))
+                Section {
+                    Toggle("Daily Goal Progress", isOn: $settings.isDailyGoalEnabled)
+                    Toggle("Streak Updates", isOn: $settings.isStreakEnabled)
+                } header: {
+                    Text("Goal Notifications")
+                } footer: {
+                    Text("Receive updates about your daily goals and streak achievements")
                 }
             }
         }
         .navigationTitle("Notifications")
+        .onAppear {
+            UNUserNotificationCenter.current().getNotificationSettings { settings in
+                if settings.authorizationStatus == .notDetermined {
+                    requestNotificationPermission()
+                }
+            }
+        }
+    }
+    
+    private func requestNotificationPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if let error = error {
+                print("Error requesting notification permission: \(error)")
+            }
+            if !granted {
+                settings.isNotificationsEnabled = false
+            }
+        }
+    }
+    
+    private func requestTimerNotificationPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, _ in
+            if !granted {
+                DispatchQueue.main.async {
+                    settings.isTimerCompletionEnabled = false
+                }
+            }
+        }
+    }
+    
+    private func scheduleDailyReminder() {
+        guard settings.isDailyReminderEnabled else { return }
+        
+        let content = UNMutableNotificationContent()
+        content.title = "Time to Focus!"
+        content.body = "Start your day with a focused mindset 🎯"
+        content.sound = .default
+        
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.hour, .minute], from: settings.dailyReminderTime)
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
+        let request = UNNotificationRequest(identifier: "dailyReminder", content: content, trigger: trigger)
+        
+        UNUserNotificationCenter.current().add(request)
+    }
+    
+    private func cancelDailyReminder() {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["dailyReminder"])
     }
 } 

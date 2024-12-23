@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import UserNotifications
 
 @main
 struct FocusLandApp: App {
@@ -16,6 +17,13 @@ struct FocusLandApp: App {
     init() {
         do {
             container = try ModelContainer(for: TimerSettings.self, FocusSession.self)
+            
+            // Request notification permissions when app launches
+            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                if let error = error {
+                    print("Error requesting notification permission: \(error)")
+                }
+            }
         } catch {
             fatalError("Failed to initialize Swift Data container")
         }
