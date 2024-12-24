@@ -35,6 +35,7 @@ struct FocusLandApp: App {
                 .environment(timerManager)
                 .modelContainer(container)
                 .onOpenURL { url in
+                    print("Received URL: \(url.absoluteString)")
                     SpotifyService.shared.handleCallback(url)
                 }
         }

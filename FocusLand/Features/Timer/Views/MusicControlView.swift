@@ -7,6 +7,11 @@ struct MusicControlView: View {
     
     var body: some View {
         VStack(spacing: 12) {
+            if spotifyService.isPlayerReady {
+                SpotifyPlayerView(spotifyService: spotifyService)
+                    .frame(height: 80)
+            }
+            
             Button(action: { 
                 if spotifyService.isConnected {
                     showingPlaylists = true
@@ -52,8 +57,9 @@ struct PlaylistsView: View {
                     List(playlists) { playlist in
                         PlaylistRow(playlist: playlist)
                             .onTapGesture {
-                                spotifyService.playPlaylist(playlist.uri)
-                                dismiss()
+                                Task {
+                                    await spotifyService.playPlaylist(playlist.uri)
+                                }
                             }
                     }
                 }
@@ -67,6 +73,13 @@ struct PlaylistsView: View {
                     }
                     .foregroundColor(accentColor)
                 }
+            }
+            .alert("Spotify Error", isPresented: .constant(spotifyService.errorMessage != nil)) {
+                Button("OK") {
+                    spotifyService.errorMessage = nil
+                }
+            } message: {
+                Text(spotifyService.errorMessage ?? "")
             }
         }
         .task {
@@ -90,7 +103,7 @@ struct PlaylistRow: View {
     
     var body: some View {
         HStack(spacing: 12) {
-            if let imageURL = playlist.images.first?.url {
+            if let imageURL = playlist.images?.first?.url {
                 AsyncImage(url: URL(string: imageURL)) { image in
                     image
                         .resizable()

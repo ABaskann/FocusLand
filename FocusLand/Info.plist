@@ -9,6 +9,10 @@
 		<dict>
 			<key>CFBundleURLName</key>
 			<string>com.app.FocusLand</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>focusland</string>
+			</array>
 		</dict>
 	</array>
 	<key>UIBackgroundModes</key>
@@ -16,6 +20,11 @@
 		<string>remote-notification</string>
 		<string>processing</string>
 		<string>fetch</string>
+		<string>audio</string>
 	</array>
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+      <string>spotify</string>
+    </array>
 </dict>
 </plist>
