@@ -16,6 +16,11 @@ class TimerSettings {
     var isDailyGoalEnabled: Bool
     var isStreakEnabled: Bool
     var dailyReminderTime: Date
+    var timerStyle: String
+    
+    var timerStyleEnum: TimerStyle {
+        TimerStyle(rawValue: timerStyle) ?? .circular
+    }
     
     init(workDuration: Int = 25, 
          shortBreakDuration: Int = 5,
@@ -37,5 +42,6 @@ class TimerSettings {
         self.isDailyGoalEnabled = true
         self.isStreakEnabled = true
         self.dailyReminderTime = Calendar.current.date(from: DateComponents(hour: 9, minute: 0)) ?? Date()
+        self.timerStyle = TimerStyle.circular.rawValue
     }
 } 

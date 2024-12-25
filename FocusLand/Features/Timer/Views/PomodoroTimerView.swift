@@ -33,20 +33,93 @@ struct PomodoroTimerView: View {
     
     var body: some View {
         NavigationView {
-            VStack {
+            VStack(spacing: 30) {
                 SessionIndicatorView(
                     currentPomodoro: timerManager.consecutiveWorkPeriods,
                     totalPomodoros: settings.first?.pomodorosBeforeLongBreak ?? 4,
                     isWorkTime: timerManager.isWorkTime,
                     accentColor: timerColor
                 )
-                .padding(.top)
+                .padding(.top, 40)
                 
-                CircularTimerView(
-                    progress: progress,
-                    timerColor: timerColor,
-                    timeRemaining: timerManager.timeRemaining
-                )
+                Spacer()
+                
+                // Timer View
+                Group {
+                    switch settings.first?.timerStyleEnum ?? .circular {
+                    case .circular:
+                        CircularTimerView(
+                            progress: progress,
+                            timerColor: timerColor,
+                            timeRemaining: timerManager.timeRemaining
+                        )
+                    case .minimal:
+                        MinimalTimerView(
+                            timeRemaining: timerManager.timeRemaining,
+                            progress: progress,
+                            accentColor: timerColor,
+                            isActive: timerManager.isActive
+                        )
+                    case .modern:
+                        ModernTimerView(
+                            timeRemaining: timerManager.timeRemaining,
+                            progress: progress,
+                            accentColor: timerColor,
+                            isActive: timerManager.isActive
+                        )
+                    case .classic:
+                        ClassicTimerView(
+                            timeRemaining: timerManager.timeRemaining,
+                            progress: progress,
+                            accentColor: timerColor,
+                            isActive: timerManager.isActive
+                        )
+                    case .digital:
+                        DigitalTimerView(
+                            timeRemaining: timerManager.timeRemaining,
+                            progress: progress,
+                            accentColor: timerColor,
+                            isActive: timerManager.isActive
+                        )
+                    case .analog:
+                        AnalogTimerView(
+                            timeRemaining: timerManager.timeRemaining,
+                            progress: progress,
+                            accentColor: timerColor,
+                            isActive: timerManager.isActive
+                        )
+                    case .wave:
+                        WaveTimerView(
+                            timeRemaining: timerManager.timeRemaining,
+                            progress: progress,
+                            accentColor: timerColor,
+                            isActive: timerManager.isActive
+                        )
+                    case .gradient:
+                        GradientTimerView(
+                            timeRemaining: timerManager.timeRemaining,
+                            progress: progress,
+                            accentColor: timerColor,
+                            isActive: timerManager.isActive
+                        )
+                    case .segments:
+                        SegmentsTimerView(
+                            timeRemaining: timerManager.timeRemaining,
+                            progress: progress,
+                            accentColor: timerColor,
+                            isActive: timerManager.isActive
+                        )
+                    case .retro:
+                        RetroTimerView(
+                            timeRemaining: timerManager.timeRemaining,
+                            progress: progress,
+                            accentColor: timerColor,
+                            isActive: timerManager.isActive
+                        )
+                    }
+                }
+                
+                Spacer()
                 
                 HStack(spacing: 30) {
                     Button(action: toggleTimer) {
@@ -67,8 +140,7 @@ struct PomodoroTimerView: View {
                             .foregroundColor(timerColor)
                     }
                 }
-                
-                // Removed skip break button since it's not part of the Pomodoro technique
+                .padding(.bottom, 40)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.black)
@@ -79,7 +151,6 @@ struct PomodoroTimerView: View {
             .onDisappear {
                 UIApplication.shared.isIdleTimerDisabled = false
             }
-//            .navigationTitle(timerTitle)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showingSettings.toggle() }) {
@@ -91,10 +162,13 @@ struct PomodoroTimerView: View {
             }
         }
         .sheet(isPresented: $showingColorPicker) {
-            ColorPickerView(selectedColor: Binding(
-                get: { timerColor },
-                set: { updateTimerColor(to: $0) }
-            ))
+            ColorPickerView(
+                selectedColor: Binding(
+                    get: { timerColor },
+                    set: { updateTimerColor(to: $0) }
+                ),
+                settings: settings.first ?? TimerSettings()
+            )
         }
         .sheet(isPresented: $showingSettings) {
             TimerSettingsView(

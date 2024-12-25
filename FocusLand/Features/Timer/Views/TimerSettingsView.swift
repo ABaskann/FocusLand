@@ -207,4 +207,4 @@ struct RecommendationRow: View {
                 .foregroundColor(.gray)
         }
     }
-} 
+}
