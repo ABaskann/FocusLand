@@ -5,9 +5,8 @@ struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var focusSessions: [FocusSession]
     @Query private var settings: [TimerSettings]
-    @State private var currentQuote = Quote.placeholder
+    @State private var currentQuote: Quote = Quote.getTodaysQuote()
     @State private var isLoading = false
-    @State private var error: Error?
     @State private var selectedTimeFrame = 0
     @State private var showingGoalSettings = false
     
@@ -220,11 +219,7 @@ struct HomeView: View {
     
     private func fetchQuote() async {
         isLoading = true
-        do {
-            currentQuote = try await QuoteService.shared.fetchDailyQuote()
-        } catch {
-            self.error = error
-        }
+        currentQuote = await QuoteService.shared.fetchDailyQuote()
         isLoading = false
     }
 }
