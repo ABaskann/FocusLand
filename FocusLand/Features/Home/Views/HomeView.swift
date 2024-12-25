@@ -53,7 +53,21 @@ struct HomeView: View {
     }
     
     private var todayGoal: Goal {
-        goals.last ?? Goal(
+        let calendar = Calendar.current
+        let weekday = calendar.component(.weekday, from: Date()) - 1
+        let isActiveDay = settings.first?.activeDays.contains(weekday) ?? false
+        
+        if !isActiveDay {
+            return Goal(
+                id: UUID(),
+                title: "Today",
+                targetHours: 0,
+                completedMinutes: 0,
+                date: Date()
+            )
+        }
+        
+        return goals.last ?? Goal(
             id: UUID(),
             title: "Today",
             targetHours: Double(settings.first?.dailyGoalPomodoros ?? 8) * 25.0 / 60.0,
@@ -227,8 +241,8 @@ struct DailyGoalView: View {
     let goal: Goal
     let accentColor: Color
     
-    private var progress: Double {
-        min(goal.progress, 1.0)
+    private var isRestDay: Bool {
+        goal.targetHours == 0
     }
     
     var body: some View {
@@ -237,42 +251,52 @@ struct DailyGoalView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(goal.title)
                         .font(.headline)
-                    Text(String(format: "%.1f of %.1f hours", goal.completedHours, goal.targetHours))
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
+                    if isRestDay {
+                        Text("Time to recharge!")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    } else {
+                        Text(String(format: "%.1f of %.1f hours", goal.completedHours, goal.targetHours))
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
                 }
                 
                 Spacer()
                 
-                Text(String(format: "%.0f%%", progress * 100))
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(accentColor)
-            }
-            
-            // Progress Bar
-            GeometryReader { geometry in
-                ZStack(alignment: .leading) {
-                    Rectangle()
-                        .fill(accentColor.opacity(0.2))
-                        .frame(height: 8)
-                        .cornerRadius(4)
-                    
-                    Rectangle()
-                        .fill(accentColor)
-                        .frame(width: geometry.size.width * progress, height: 8)
-                        .cornerRadius(4)
+                if !isRestDay {
+                    Text(String(format: "%.0f%%", goal.progress * 100))
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(accentColor)
                 }
             }
-            .frame(height: 8)
+            
+            if !isRestDay {
+                // Progress Bar
+                GeometryReader { geometry in
+                    ZStack(alignment: .leading) {
+                        Rectangle()
+                            .fill(accentColor.opacity(0.2))
+                            .frame(height: 8)
+                            .cornerRadius(4)
+                        
+                        Rectangle()
+                            .fill(accentColor)
+                            .frame(width: geometry.size.width * goal.progress, height: 8)
+                            .cornerRadius(4)
+                    }
+                }
+                .frame(height: 8)
+            }
             
             // Status Message
             HStack {
-                Image(systemName: getStatusIcon())
-                    .foregroundColor(getStatusColor())
-                Text(getStatusMessage())
+                Image(systemName: isRestDay ? "moon.stars.fill" : getStatusIcon())
+                    .foregroundColor(isRestDay ? .purple : getStatusColor())
+                Text(isRestDay ? "Rest day - Take time to recharge" : getStatusMessage())
                     .font(.caption)
-                    .foregroundColor(getStatusColor())
+                    .foregroundColor(isRestDay ? .purple : getStatusColor())
             }
         }
         .padding()
@@ -281,9 +305,9 @@ struct DailyGoalView: View {
     }
     
     private func getStatusIcon() -> String {
-        if progress >= 1.0 {
+        if goal.progress >= 1.0 {
             return "checkmark.circle.fill"
-        } else if progress >= 0.5 {
+        } else if goal.progress >= 0.5 {
             return "arrow.up.circle.fill"
         } else {
             return "arrow.right.circle.fill"
@@ -291,9 +315,9 @@ struct DailyGoalView: View {
     }
     
     private func getStatusColor() -> Color {
-        if progress >= 1.0 {
+        if goal.progress >= 1.0 {
             return .green
-        } else if progress >= 0.5 {
+        } else if goal.progress >= 0.5 {
             return accentColor
         } else {
             return .gray
@@ -301,11 +325,11 @@ struct DailyGoalView: View {
     }
     
     private func getStatusMessage() -> String {
-        if progress >= 1.0 {
+        if goal.progress >= 1.0 {
             return "Goal completed!"
-        } else if progress >= 0.5 {
+        } else if goal.progress >= 0.5 {
             return "More than halfway there!"
-        } else if progress > 0 {
+        } else if goal.progress > 0 {
             return "Keep going!"
         } else {
             return "Start your focus session!"

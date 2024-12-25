@@ -68,10 +68,7 @@ struct PomodoroTimerView: View {
                     }
                 }
                 
-                MusicControlView(accentColor: timerColor)
-                    .padding(.top, 20)
-                
-                Spacer()
+                // Removed skip break button since it's not part of the Pomodoro technique
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.black)
