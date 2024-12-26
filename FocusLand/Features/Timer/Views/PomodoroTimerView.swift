@@ -172,8 +172,9 @@ struct PomodoroTimerView: View {
             .preferredColorScheme(.dark)
             .onChange(of: timerManager.isActive) { _, isActive in
                 UIApplication.shared.isIdleTimerDisabled = isActive
-                // Start/stop sound with timer
-                if isActive && soundManager.selectedSound != .none {
+                
+                // Only play sound during work sessions
+                if isActive && timerManager.isWorkTime && soundManager.selectedSound != .none {
                     soundManager.playSound()
                 } else {
                     soundManager.stopSound()
@@ -267,6 +268,10 @@ struct PomodoroTimerView: View {
     
     private func handleTimerCompletion() {
         timerManager.isActive = false
+        
+        // Stop sound when timer completes
+        soundManager.stopSound()
+        
         if timerManager.isWorkTime {
             notificationHaptic.notificationOccurred(.success)
             
