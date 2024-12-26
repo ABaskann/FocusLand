@@ -210,6 +210,15 @@ struct PomodoroTimerView: View {
                     }
                 }
             }
+            .sheet(isPresented: $showingSettings) {
+                if let settings = settings.first {
+                    TimerSettingsView(
+                        settings: settings,
+                        accentColor: timerColor,
+                        shouldResetTimer: !timerManager.isActive // Only reset if timer is not active
+                    )
+                }
+            }
         }
         .sheet(isPresented: $showingColorPicker) {
             ColorPickerView(
@@ -218,12 +227,6 @@ struct PomodoroTimerView: View {
                     set: { updateTimerColor(to: $0) }
                 ),
                 settings: settings.first ?? TimerSettings()
-            )
-        }
-        .sheet(isPresented: $showingSettings) {
-            TimerSettingsView(
-                settings: settings.first ?? TimerSettings(),
-                accentColor: timerColor
             )
         }
         .onReceive(timer) { _ in

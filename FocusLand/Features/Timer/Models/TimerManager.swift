@@ -16,13 +16,17 @@ class TimerManager {
         if isWorkTime {
             timeRemaining = (settings?.workDuration ?? 25) * 60
         } else {
-            // If we've completed enough work periods, use long break duration
             if consecutiveWorkPeriods >= (settings?.pomodorosBeforeLongBreak ?? 4) {
                 timeRemaining = (settings?.longBreakDuration ?? 15) * 60
-                consecutiveWorkPeriods = 0  // Reset the counter after a long break
+                consecutiveWorkPeriods = 0
             } else {
                 timeRemaining = (settings?.shortBreakDuration ?? 5) * 60
             }
         }
+    }
+    
+    // New method for updating visual settings without affecting the timer
+    func updateVisualSettings() {
+        // No timer reset, just trigger UI update
     }
 } 

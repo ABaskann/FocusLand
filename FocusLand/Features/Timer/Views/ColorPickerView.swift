@@ -4,6 +4,7 @@ import SwiftData
 struct ColorPickerView: View {
     @Binding var selectedColor: Color
     @Environment(\.dismiss) private var dismiss
+    @Environment(TimerManager.self) private var timerManager
     @Bindable var settings: TimerSettings
     
     private let colors: [Color] = [
@@ -26,6 +27,7 @@ struct ColorPickerView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
+                        timerManager.updateVisualSettings()
                         dismiss()
                     }
                 }

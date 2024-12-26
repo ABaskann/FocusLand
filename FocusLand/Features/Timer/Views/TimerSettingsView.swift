@@ -6,6 +6,7 @@ struct TimerSettingsView: View {
     @Environment(TimerManager.self) private var timerManager
     @Bindable var settings: TimerSettings
     let accentColor: Color
+    let shouldResetTimer: Bool
     
     private let workDurationRange = 15...60
     private let shortBreakRange = 3...10
@@ -141,7 +142,9 @@ struct TimerSettingsView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
-                        timerManager.resetTimer(settings: settings)
+                        if shouldResetTimer {
+                            timerManager.resetTimer(settings: settings)
+                        }
                         dismiss()
                     }
                     .foregroundColor(accentColor)
@@ -157,7 +160,9 @@ struct TimerSettingsView: View {
         settings.pomodorosBeforeLongBreak = 4
         settings.dailyGoalPomodoros = 8
         
-        timerManager.resetTimer(settings: settings)
+        if shouldResetTimer {
+            timerManager.resetTimer(settings: settings)
+        }
     }
 }
 
