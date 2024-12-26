@@ -170,14 +170,14 @@ struct ProfileView: View {
                     }
                     
                     // Additional Stats
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Statistics")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .padding(.horizontal)
-                        
-                        // Add more stats here
-                    }
+//                    VStack(alignment: .leading, spacing: 16) {
+//                        Text("Statistics")
+//                            .font(.title2)
+//                            .fontWeight(.bold)
+//                            .padding(.horizontal)
+//                        
+//                        // Add more stats here
+//                    }
                 }
                 .padding(.vertical)
             }

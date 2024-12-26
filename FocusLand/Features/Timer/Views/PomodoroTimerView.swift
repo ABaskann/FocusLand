@@ -155,56 +155,17 @@ struct PomodoroTimerView: View {
                 HStack(spacing: 30) {
                     Button(action: toggleTimer) {
                         Image(systemName: timerManager.isActive ? "pause.circle.fill" : "play.circle.fill")
-                            .font(.system(size: 30))
+                            .font(.system(size: 40))
                             .foregroundColor(timerColor)
                     }
                     
                     Button(action: resetTimer) {
                         Image(systemName: "arrow.clockwise.circle.fill")
-                            .font(.system(size: 30))
-                            .foregroundColor(timerColor)
-                    }
-                    
-                    Button(action: { showingColorPicker.toggle() }) {
-                        Image(systemName: "paintpalette.fill")
-                            .font(.system(size: 30))
-                            .foregroundColor(timerColor)
-                    }
-                    
-                    // Sound Menu Button moved here with music icon
-                    Menu {
-                        ForEach(SoundManager.TimerSound.allCases, id: \.self) { sound in
-                            Button {
-                                soundManager.selectedSound = sound
-                                soundManager.changeSound()
-                            } label: {
-                                Label(sound.name, systemImage: sound.icon)
-                            }
-                        }
-                    } label: {
-                        Image(systemName: "music.note.list")
-                            .font(.system(size: 30))
+                            .font(.system(size: 40))
                             .foregroundColor(timerColor)
                     }
                 }
                 .padding(.bottom, 40)
-                
-//                // Sound Menu Button
-//                Menu {
-//                    ForEach(SoundManager.TimerSound.allCases, id: \.self) { sound in
-//                        Button {
-//                            soundManager.selectedSound = sound
-//                            soundManager.changeSound()
-//                        } label: {
-//                            Label(sound.name, systemImage: sound.icon)
-//                        }
-//                    }
-//                } label: {
-//                    Image(systemName: "ellipsis.circle.fill")
-//                        .font(.system(size: 24))
-//                        .foregroundColor(timerColor)
-//                }
-//                .padding(.bottom, 20)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.black)
@@ -222,6 +183,24 @@ struct PomodoroTimerView: View {
                 UIApplication.shared.isIdleTimerDisabled = false
             }
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    // Sound Menu Button
+                    Menu {
+                        ForEach(SoundManager.TimerSound.allCases, id: \.self) { sound in
+                            Button {
+                                soundManager.selectedSound = sound
+                                soundManager.changeSound()
+                            } label: {
+                                Label(sound.name, systemImage: sound.icon)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "music.note.list")
+                            .font(.system(size: 22))
+                            .foregroundColor(timerColor)
+                    }
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showingSettings.toggle() }) {
                         Image(systemName: "gear.circle.fill")

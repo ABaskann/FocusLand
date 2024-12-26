@@ -17,6 +17,8 @@ struct TimerSettingsView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
+                    TimerCustomizationSection(settings: settings, accentColor: accentColor)
+                    
                     // Timer Settings Group
                     VStack(spacing: 12) {
                         Text("Timer Settings")

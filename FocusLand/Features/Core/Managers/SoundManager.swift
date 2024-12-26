@@ -51,19 +51,7 @@ class SoundManager {
         guard selectedSound != .none else { return }
         
         if audioPlayer == nil {
-            if let soundURL = Bundle.main.url(forResource: selectedSound.rawValue, withExtension: "mp3") {
-                do {
-                    try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
-                    try AVAudioSession.sharedInstance().setActive(true)
-                    
-                    audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
-                    audioPlayer?.numberOfLoops = -1 // Loop indefinitely
-                    audioPlayer?.volume = volume
-                } catch {
-                    print("Failed to initialize audio player: \(error)")
-                    return
-                }
-            }
+            initializeAudioPlayer()
         }
         
         audioPlayer?.play()
@@ -80,10 +68,29 @@ class SoundManager {
     }
     
     func changeSound() {
+        let wasPlaying = isPlaying // Store the playing state
         stopSound()
         audioPlayer = nil
-        if isPlaying {
+        if wasPlaying { // If it was playing before, start the new sound
             playSound()
+        }
+    }
+    
+    private func initializeAudioPlayer() {
+        guard let soundURL = Bundle.main.url(forResource: selectedSound.rawValue, withExtension: "mp3") else {
+            print("Could not find sound file: \(selectedSound.rawValue)")
+            return
+        }
+        
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try AVAudioSession.sharedInstance().setActive(true)
+            
+            audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
+            audioPlayer?.numberOfLoops = -1 // Loop indefinitely
+            audioPlayer?.volume = volume
+        } catch {
+            print("Failed to initialize audio player: \(error)")
         }
     }
 } 
