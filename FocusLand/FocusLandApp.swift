@@ -8,11 +8,13 @@
 import SwiftUI
 import SwiftData
 import UserNotifications
+import AVFoundation
 
 @main
 struct FocusLandApp: App {
     let container: ModelContainer
     @State private var timerManager = TimerManager()
+    @State private var soundManager = SoundManager()
     
     init() {
         do {
@@ -24,6 +26,10 @@ struct FocusLandApp: App {
                     print("Error requesting notification permission: \(error)")
                 }
             }
+            
+            // Configure audio session
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try AVAudioSession.sharedInstance().setActive(true)
         } catch {
             fatalError("Failed to initialize Swift Data container")
         }
@@ -33,6 +39,7 @@ struct FocusLandApp: App {
         WindowGroup {
             MainTabView()
                 .environment(timerManager)
+                .environment(soundManager)
         }
         .modelContainer(container)
     }

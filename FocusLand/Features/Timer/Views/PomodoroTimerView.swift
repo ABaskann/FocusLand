@@ -5,6 +5,7 @@ struct PomodoroTimerView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(TimerManager.self) private var timerManager
     @Query private var settings: [TimerSettings]
+    @Environment(SoundManager.self) private var soundManager
     
     @State private var showingColorPicker = false
     @State private var showingSettings = false
@@ -121,32 +122,101 @@ struct PomodoroTimerView: View {
                 
                 Spacer()
                 
+                // Sound Control Section
+                if soundManager.selectedSound != .none {
+                    VStack(spacing: 16) {
+                        Label(soundManager.selectedSound.name, systemImage: soundManager.selectedSound.icon)
+                            .foregroundColor(timerColor)
+                        
+                        HStack(spacing: 12) {
+                            Image(systemName: "speaker.fill")
+                                .foregroundColor(timerColor)
+                            
+                            Slider(
+                                value: .init(
+                                    get: { soundManager.volume },
+                                    set: { 
+                                        soundManager.volume = $0
+                                        soundManager.updateVolume()
+                                    }
+                                ),
+                                in: 0...1
+                            )
+                            .tint(timerColor)
+                            
+                            Image(systemName: "speaker.wave.3.fill")
+                                .foregroundColor(timerColor)
+                        }
+                    }
+                    .padding(.horizontal, 40)
+                }
+                
+                // Timer Controls
                 HStack(spacing: 30) {
                     Button(action: toggleTimer) {
                         Image(systemName: timerManager.isActive ? "pause.circle.fill" : "play.circle.fill")
-                            .font(.system(size: 40))
+                            .font(.system(size: 30))
                             .foregroundColor(timerColor)
                     }
                     
                     Button(action: resetTimer) {
                         Image(systemName: "arrow.clockwise.circle.fill")
-                            .font(.system(size: 40))
+                            .font(.system(size: 30))
                             .foregroundColor(timerColor)
                     }
                     
                     Button(action: { showingColorPicker.toggle() }) {
                         Image(systemName: "paintpalette.fill")
-                            .font(.system(size: 40))
+                            .font(.system(size: 30))
+                            .foregroundColor(timerColor)
+                    }
+                    
+                    // Sound Menu Button moved here with music icon
+                    Menu {
+                        ForEach(SoundManager.TimerSound.allCases, id: \.self) { sound in
+                            Button {
+                                soundManager.selectedSound = sound
+                                soundManager.changeSound()
+                            } label: {
+                                Label(sound.name, systemImage: sound.icon)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "music.note.list")
+                            .font(.system(size: 30))
                             .foregroundColor(timerColor)
                     }
                 }
                 .padding(.bottom, 40)
+                
+//                // Sound Menu Button
+//                Menu {
+//                    ForEach(SoundManager.TimerSound.allCases, id: \.self) { sound in
+//                        Button {
+//                            soundManager.selectedSound = sound
+//                            soundManager.changeSound()
+//                        } label: {
+//                            Label(sound.name, systemImage: sound.icon)
+//                        }
+//                    }
+//                } label: {
+//                    Image(systemName: "ellipsis.circle.fill")
+//                        .font(.system(size: 24))
+//                        .foregroundColor(timerColor)
+//                }
+//                .padding(.bottom, 20)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.black)
             .preferredColorScheme(.dark)
             .onChange(of: timerManager.isActive) { _, isActive in
                 UIApplication.shared.isIdleTimerDisabled = isActive
+                // Start/stop sound with timer
+                if isActive && soundManager.selectedSound != .none {
+                    soundManager.playSound()
+                } else {
+                    soundManager.stopSound()
+                }
             }
             .onDisappear {
                 UIApplication.shared.isIdleTimerDisabled = false
