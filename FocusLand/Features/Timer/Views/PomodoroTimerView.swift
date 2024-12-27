@@ -220,6 +220,7 @@ struct PomodoroTimerView: View {
                 }
             }
         }
+        .navigationViewStyle(.stack)
         .sheet(isPresented: $showingColorPicker) {
             ColorPickerView(
                 selectedColor: Binding(

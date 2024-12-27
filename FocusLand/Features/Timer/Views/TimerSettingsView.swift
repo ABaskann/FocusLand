@@ -151,6 +151,7 @@ struct TimerSettingsView: View {
                 }
             }
         }
+        .navigationViewStyle(.stack)
     }
     
     private func resetToDefault() {

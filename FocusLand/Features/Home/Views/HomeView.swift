@@ -212,6 +212,7 @@ struct HomeView: View {
                 }
             }
         }
+        .navigationViewStyle(.stack)
         .task {
             await fetchQuote()
         }
