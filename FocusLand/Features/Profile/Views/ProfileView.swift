@@ -144,28 +144,32 @@ struct ProfileView: View {
                     }
                     .padding(.vertical)
                     
-                    // Goal Summary
-                    GoalsSummaryView(
-                        goal: todayGoal,
-                        accentColor: accentColor,
-                        streak: currentStreak
-                    )
+                    PremiumFeatureView {
+                        // Goal Summary becomes premium
+                        GoalsSummaryView(
+                            goal: todayGoal,
+                            accentColor: accentColor,
+                            streak: currentStreak
+                        )
+                    }
                     .padding(.horizontal)
                     
-                    // Achievements Section
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Achievements")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .padding(.horizontal)
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            LazyHStack(spacing: 16) {
-                                ForEach(achievements) { achievement in
-                                    AchievementView(achievement: achievement)
+                    PremiumFeatureView {
+                        // Achievements section becomes premium
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Achievements")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .padding(.horizontal)
+                            
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                LazyHStack(spacing: 16) {
+                                    ForEach(achievements) { achievement in
+                                        AchievementView(achievement: achievement)
+                                    }
                                 }
+                                .padding(.horizontal)
                             }
-                            .padding(.horizontal)
                         }
                     }
                     

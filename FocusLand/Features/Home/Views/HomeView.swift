@@ -140,61 +140,66 @@ struct HomeView: View {
                         accentColor: accentColor
                     )
                     .padding(.horizontal)
-                    
-                    // Goals Section
-                    VStack(alignment: .leading, spacing: 16) {
-                        HStack {
-                            Text("Focus History")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                            
-                            Spacer()
-                            
-                            Button(action: { 
-                                if settings.isEmpty {
-                                    let defaultSettings = TimerSettings()
-                                    modelContext.insert(defaultSettings)
-                                }
-                                showingGoalSettings = true 
-                            }) {
-                                Label("Set Goal", systemImage: "target")
-                                    .foregroundColor(accentColor)
-                            }
-                            
-                            Picker("Time Frame", selection: $selectedTimeFrame) {
-                                ForEach(0..<timeFrames.count, id: \.self) { index in
-                                    Text(timeFrames[index])
-                                        .tag(index)
-                                }
-                            }
-                            .pickerStyle(.segmented)
-                            .frame(width: 150)
-                        }
-                        .padding(.horizontal)
+                    PremiumFeatureView{
                         
-                        // Goals Graph
-                        if selectedTimeFrame == 0 {
-                            // Daily View
-                            DailyGoalView(
-                                goal: todayGoal,
-                                accentColor: accentColor
-                            )
+                        
+                        // Goals Section
+                        VStack(alignment: .leading, spacing: 16) {
+                            HStack {
+                                Text("Focus History")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.white)
+                                
+                                Spacer()
+                                
+                                Button(action: {
+                                    if settings.isEmpty {
+                                        let defaultSettings = TimerSettings()
+                                        modelContext.insert(defaultSettings)
+                                    }
+                                    showingGoalSettings = true
+                                }) {
+                                    Label("Set Goal", systemImage: "target")
+                                        .foregroundColor(accentColor)
+                                }
+                                
+                                Picker("Time Frame", selection: $selectedTimeFrame) {
+                                    ForEach(0..<timeFrames.count, id: \.self) { index in
+                                        Text(timeFrames[index])
+                                            .tag(index)
+                                    }
+                                }
+                                .pickerStyle(.segmented)
+                                .frame(width: 150)
+                            }
                             .padding(.horizontal)
-                        } else {
-                            // Weekly View
-                            GoalsGraphView(
-                                goals: goals,
-                                accentColor: accentColor
-                            )
-                            .padding(.horizontal)
+                            
+                            // Goals Graph
+                            if selectedTimeFrame == 0 {
+                                // Daily View
+                                DailyGoalView(
+                                    goal: todayGoal,
+                                    accentColor: accentColor
+                                )
+                                .padding(.horizontal)
+                            } else {
+                                // Weekly View
+                                PremiumFeatureView {
+                                    GoalsGraphView(
+                                        goals: goals,
+                                        accentColor: accentColor
+                                    )
+                                }
+                                .padding(.horizontal)
+                            }
                         }
                     }
                 }
                 .padding(.vertical)
             }
             .background(Color.black)
-//            .navigationTitle("Focus")
+            //            .navigationTitle("Focus")
             .preferredColorScheme(.dark)
             .onAppear {
                 if settings.isEmpty {
@@ -331,4 +336,4 @@ struct DailyGoalView: View {
             return "Start your focus session!"
         }
     }
-} 
+}

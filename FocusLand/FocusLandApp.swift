@@ -17,6 +17,7 @@ struct FocusLandApp: App {
     let container: ModelContainer
     @State private var timerManager = TimerManager()
     @State private var soundManager = SoundManager()
+    @StateObject private var userViewModel = UserViewModel.shared
     
     init() {
         do {
@@ -32,12 +33,14 @@ struct FocusLandApp: App {
             // Configure audio session
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
             try AVAudioSession.sharedInstance().setActive(true)
+            
+            // Configure RevenueCat
+            Purchases.logLevel = .debug
+            Purchases.configure(withAPIKey: Secrets.apikey)
+            Purchases.shared.delegate = PurchasesDelegateHandler.shared
         } catch {
             fatalError("Failed to initialize Swift Data container")
         }
-        Purchases.logLevel = .debug
-        Purchases.configure(withAPIKey: Secrets.apikey)
-        Purchases.shared.delegate = PurchasesDelegateHandler.shared
     }
     
     var body: some Scene {
@@ -45,8 +48,15 @@ struct FocusLandApp: App {
             MainTabView()
                 .environment(timerManager)
                 .environment(soundManager)
-                .presentPaywallIfNeeded(requiredEntitlementIdentifier: "Premium")
-               
+                .task {
+                    // Fetch offerings when app launches
+                    do {
+                        userViewModel.offerings = try await Purchases.shared.offerings()
+                        userViewModel.customerInfo = try await Purchases.shared.customerInfo()
+                    } catch {
+                        print("Error fetching offerings: \(error)")
+                    }
+                }
         }
         .modelContainer(container)
     }
