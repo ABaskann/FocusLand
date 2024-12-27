@@ -6,6 +6,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @Bindable var settings: TimerSettings
+    let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
     
     private let themeColors: [(name: String, color: Color, hex: String)] = [
         ("Orange", .orange, "#FF9500"),
@@ -26,15 +27,19 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             Form {
+                
                 Section("Theme") {
+                    PremiumFeatureView{
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 16) {
-                            ForEach(themeColors, id: \.name) { theme in
-                                ThemeButton(
-                                    color: theme.color,
-                                    isSelected: settings.selectedColor == theme.hex
-                                ) {
-                                    updateThemeColor(theme.color, hex: theme.hex)
+                        
+                            HStack(spacing: 16) {
+                                ForEach(themeColors, id: \.name) { theme in
+                                    ThemeButton(
+                                        color: theme.color,
+                                        isSelected: settings.selectedColor == theme.hex
+                                    ) {
+                                        updateThemeColor(theme.color, hex: theme.hex)
+                                    }
                                 }
                             }
                         }
@@ -53,18 +58,18 @@ struct SettingsView: View {
                 }
                 
                 Section("About") {
-                    Link(destination: URL(string: "https://yourapp.com/privacy")!) {
+                    Link(destination: URL(string: "https://focusland.armaganbaskan.com/privacy-policy.html")!) {
                         Label("Privacy Policy", systemImage: "lock.shield")
                     }
                     
-                    Link(destination: URL(string: "https://yourapp.com/terms")!) {
+                    Link(destination: URL(string: "https://focusland.armaganbaskan.com/terms.html")!) {
                         Label("Terms of Service", systemImage: "doc.text")
                     }
                     
                     HStack {
                         Label("Version", systemImage: "info.circle")
                         Spacer()
-                        Text("1.0.0")
+                        Text(appVersion)
                             .foregroundColor(.gray)
                     }
                 }

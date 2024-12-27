@@ -21,6 +21,9 @@ struct GoalSettingsView: View {
     }
     
     var body: some View {
+        PremiumFeatureView{
+            
+      
         NavigationView {
             Form {
                 Section("Daily Goal") {
@@ -140,6 +143,7 @@ struct GoalSettingsView: View {
             } message: {
                 Text("This will reset all your focus session progress. This action cannot be undone.")
             }
+        }
         }
     }
     

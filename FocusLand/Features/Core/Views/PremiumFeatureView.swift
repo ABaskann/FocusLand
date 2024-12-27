@@ -1,14 +1,19 @@
 import SwiftUI
+import _SwiftData_SwiftUI
 import RevenueCat
 import RevenueCatUI
 
 struct PremiumFeatureView<Content: View>: View {
     @ObservedObject private var userViewModel = UserViewModel.shared
     @State private var showingPaywall = false
+    @Query private var settings: [TimerSettings]
     let content: Content
     
     init(@ViewBuilder content: () -> Content) {
         self.content = content()
+    }
+    private var accentColor: Color {
+        Color(hex: settings.first?.selectedColor ?? "#FF9500") ?? .orange
     }
     
     var body: some View {
@@ -20,14 +25,16 @@ struct PremiumFeatureView<Content: View>: View {
                 VStack {
                     Image(systemName: "lock.fill")
                         .font(.system(size: 24))
-                        .foregroundColor(.gray)
+                        .foregroundColor(accentColor)
+                        .padding(.bottom)
                     
-                    Text("Premium Feature")
+                    Text("Become Premium Member")
                         .font(.headline)
-                        .foregroundColor(.gray)
+                        .foregroundColor(accentColor)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.black.opacity(0.3))
+               
                 .onTapGesture {
                     showingPaywall = true
                 }

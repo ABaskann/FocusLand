@@ -1,5 +1,7 @@
 import SwiftUI
 import SwiftData
+import RevenueCat
+import RevenueCatUI
 
 struct PomodoroTimerView: View {
     @Environment(\.modelContext) private var modelContext
@@ -9,6 +11,9 @@ struct PomodoroTimerView: View {
     
     @State private var showingColorPicker = false
     @State private var showingSettings = false
+    @State private var showPaywall = false
+    
+    @ObservedObject var userModel = UserViewModel.shared
     
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
@@ -189,10 +194,15 @@ struct PomodoroTimerView: View {
                     Menu {
                         ForEach(SoundManager.TimerSound.allCases, id: \.self) { sound in
                             Button {
-                                soundManager.selectedSound = sound
-                                soundManager.changeSound()
+                                if(sound.name == "None" || userModel.subscriptionActive || sound.name == "Nightscape"){
+                                    soundManager.selectedSound = sound
+                                    soundManager.changeSound()
+                                }else{
+                                    showPaywall = true
+                                }
+                              
                             } label: {
-                                Label(sound.name, systemImage: sound.icon)
+                                Label(sound.name, systemImage: (sound.name == "None" || userModel.subscriptionActive || sound.name == "Nightscape") ? sound.icon : "lock.fill")
                             }
                         }
                     } label: {
@@ -229,6 +239,9 @@ struct PomodoroTimerView: View {
                 ),
                 settings: settings.first ?? TimerSettings()
             )
+        }
+        .sheet(isPresented:$showPaywall) {
+            PaywallView()
         }
         .onReceive(timer) { _ in
             guard timerManager.isActive else { return }

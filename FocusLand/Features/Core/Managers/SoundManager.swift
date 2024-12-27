@@ -5,7 +5,7 @@ class SoundManager {
     private var audioPlayer: AVAudioPlayer?
     var isPlaying = false
     var volume: Float = 0.5
-    var selectedSound: TimerSound = .healingWater
+    var selectedSound: TimerSound = .nightscape
     
     enum TimerSound: String, CaseIterable {
         case healingWater = "HealingWater"
