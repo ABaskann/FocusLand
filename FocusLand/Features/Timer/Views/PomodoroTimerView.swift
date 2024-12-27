@@ -190,26 +190,10 @@ struct PomodoroTimerView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    // Sound Menu Button
-                    Menu {
-                        ForEach(SoundManager.TimerSound.allCases, id: \.self) { sound in
-                            Button {
-                                if(sound.name == "None" || userModel.subscriptionActive || sound.name == "Nightscape"){
-                                    soundManager.selectedSound = sound
-                                    soundManager.changeSound()
-                                }else{
-                                    showPaywall = true
-                                }
-                              
-                            } label: {
-                                Label(sound.name, systemImage: (sound.name == "None" || userModel.subscriptionActive || sound.name == "Nightscape") ? sound.icon : "lock.fill")
-                            }
-                        }
-                    } label: {
-                        Image(systemName: "music.note.list")
-                            .font(.system(size: 22))
-                            .foregroundColor(timerColor)
-                    }
+                    SoundMenuView(
+                        showPaywall: $showPaywall,
+                        timerColor: timerColor
+                    )
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
