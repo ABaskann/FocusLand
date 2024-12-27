@@ -9,6 +9,8 @@ import SwiftUI
 import SwiftData
 import UserNotifications
 import AVFoundation
+import RevenueCat
+import RevenueCatUI
 
 @main
 struct FocusLandApp: App {
@@ -33,6 +35,9 @@ struct FocusLandApp: App {
         } catch {
             fatalError("Failed to initialize Swift Data container")
         }
+        Purchases.logLevel = .debug
+        Purchases.configure(withAPIKey: Secrets.apikey)
+        Purchases.shared.delegate = PurchasesDelegateHandler.shared
     }
     
     var body: some Scene {
@@ -40,6 +45,8 @@ struct FocusLandApp: App {
             MainTabView()
                 .environment(timerManager)
                 .environment(soundManager)
+                .presentPaywallIfNeeded(requiredEntitlementIdentifier: "Premium")
+               
         }
         .modelContainer(container)
     }

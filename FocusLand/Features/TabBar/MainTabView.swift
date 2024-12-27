@@ -1,6 +1,7 @@
 import SwiftUI
 import _SwiftData_SwiftUI
 
+
 struct MainTabView: View {
     @Query private var settings: [TimerSettings]
     @Environment(TimerManager.self) private var timerManager
