@@ -18,9 +18,10 @@ struct TimerSettingsView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
+                    TimerCustomizationSection(settings: settings, accentColor: accentColor)
                     PremiumFeatureView{
-                        TimerCustomizationSection(settings: settings, accentColor: accentColor)
-                    }
+                        
+                   
                    
                     
                     // Timer Settings Group
@@ -100,6 +101,7 @@ struct TimerSettingsView: View {
                     .padding()
                     .background(Color.black.opacity(0.3))
                     .cornerRadius(16)
+                    }
                     
                     // Recommendations Section
                     VStack(spacing: 12) {

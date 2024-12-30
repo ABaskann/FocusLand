@@ -25,7 +25,10 @@ struct TimerCustomizationSection: View {
                 .padding(.vertical, 8)
             
             // Timer Style Scroll
-            TimerStyleScrollView(settings: settings, accentColor: accentColor)
+            PremiumFeatureView{
+                TimerStyleScrollView(settings: settings, accentColor: accentColor)
+            }
+            
         }
         .padding()
         .background(Color.black.opacity(0.3))

@@ -29,7 +29,7 @@ struct SettingsView: View {
             Form {
                 
                 Section("Theme") {
-                    PremiumFeatureView{
+                    
                     ScrollView(.horizontal, showsIndicators: false) {
                         
                             HStack(spacing: 16) {
@@ -44,7 +44,7 @@ struct SettingsView: View {
                             }
                         }
                         .padding(.vertical, 8)
-                    }
+                    
                 }
                 
                 Section("App Settings") {
