@@ -8,6 +8,9 @@ struct PomodoroTimerView: View {
     @Environment(TimerManager.self) private var timerManager
     @Query private var settings: [TimerSettings]
     @Environment(SoundManager.self) private var soundManager
+    @Environment(\.requestReview) var requestReview
+    @AppStorage("times") var times: Int = 0
+    @AppStorage("showReview") var showReview: Bool = true
     
     @State private var showingColorPicker = false
     @State private var showingSettings = false
@@ -187,6 +190,13 @@ struct PomodoroTimerView: View {
             }
             .onDisappear {
                 UIApplication.shared.isIdleTimerDisabled = false
+            }
+            .onAppear{
+               
+                times += 1
+                if(times == 1) {
+                    requestReview()
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

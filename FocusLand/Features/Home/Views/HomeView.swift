@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import GoogleMobileAds
 
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
@@ -9,11 +10,13 @@ struct HomeView: View {
     @State private var isLoading = false
     @State private var selectedTimeFrame = 0
     @State private var showingGoalSettings = false
+    @ObservedObject var userModel = UserViewModel.shared
     
     private let timeFrames = ["Daily", "Weekly"]
     private var accentColor: Color {
         Color(hex: settings.first?.selectedColor ?? "#FF9500") ?? .orange
     }
+    
     
     private var goals: [Goal] {
         let calendar = Calendar.current
@@ -195,6 +198,11 @@ struct HomeView: View {
                             }
                         }
                     }
+                    if(!userModel.subscriptionActive){
+                        Spacer().frame(height: 300)
+                        BannerView().frame(width: GADAdSizeBanner.size.width,height: GADAdSizeBanner.size.height).offset(y:-30)
+                    }
+                   
                 }
                 .padding(.vertical)
             }

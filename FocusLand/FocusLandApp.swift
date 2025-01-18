@@ -11,6 +11,7 @@ import UserNotifications
 import AVFoundation
 import RevenueCat
 import RevenueCatUI
+import GoogleMobileAds
 
 @main
 struct FocusLandApp: App {
@@ -20,6 +21,7 @@ struct FocusLandApp: App {
     @StateObject private var userViewModel = UserViewModel.shared
     
     init() {
+        GADMobileAds.sharedInstance().start(completionHandler: nil)
         do {
             container = try ModelContainer(for: TimerSettings.self, FocusSession.self)
             

@@ -5,7 +5,7 @@ import _SwiftData_SwiftUI
 struct MainTabView: View {
     @Query private var settings: [TimerSettings]
     @Environment(TimerManager.self) private var timerManager
-    @State private var selectedTab = 0
+    @State private var selectedTab = 1
     @State private var attemptedTab: Int?
     @State private var showingAlert = false
     

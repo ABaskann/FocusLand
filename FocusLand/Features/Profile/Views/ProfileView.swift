@@ -1,11 +1,13 @@
 import SwiftUI
 import SwiftData
+import GoogleMobileAds
 
 struct ProfileView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var focusSessions: [FocusSession]
     @Query private var settings: [TimerSettings]
     @State private var showingSettings = false
+    @ObservedObject var userModel = UserViewModel.shared
     
     private var accentColor: Color {
         Color(hex: settings.first?.selectedColor ?? "#FF9500") ?? .orange
@@ -172,6 +174,10 @@ struct ProfileView: View {
                             }
                         }
                     }
+                    if(!userModel.subscriptionActive){
+                        Spacer().frame(height: 32)
+                        BannerView().frame(width: GADAdSizeBanner.size.width,height: GADAdSizeBanner.size.height).offset(y:-30)
+                    }
                     
                     // Additional Stats
 //                    VStack(alignment: .leading, spacing: 16) {
@@ -204,4 +210,10 @@ struct ProfileView: View {
         }
         .navigationViewStyle(.stack)
     }
-} 
+}
+
+struct ProfileView_Previews: PreviewProvider {
+    static var previews: some View {
+        ProfileView()
+    }
+}

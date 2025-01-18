@@ -1,11 +1,3 @@
-//
-//  we.swift
-//  FocusLand
-//
-//  Created by Armağan Başkan on 27.12.2024.
-//
-
-
 
 import Foundation
 import RevenueCat
