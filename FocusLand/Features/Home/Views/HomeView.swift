@@ -199,7 +199,7 @@ struct HomeView: View {
                         }
                     }
                     if(!userModel.subscriptionActive){
-                        Spacer().frame(height: 300)
+                        Spacer().frame(height: 280)
                         BannerView().frame(width: GADAdSizeBanner.size.width,height: GADAdSizeBanner.size.height).offset(y:-30)
                     }
                    

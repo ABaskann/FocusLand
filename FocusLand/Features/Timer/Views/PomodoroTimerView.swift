@@ -12,6 +12,8 @@ struct PomodoroTimerView: View {
     @AppStorage("times") var times: Int = 0
     @AppStorage("showReview") var showReview: Bool = true
     
+    let adCoordinator = AdCoordinator()
+    
     @State private var showingColorPicker = false
     @State private var showingSettings = false
     @State private var showPaywall = false
@@ -38,6 +40,11 @@ struct PomodoroTimerView: View {
     
     private var timerColor: Color {
         Color(hex: settings.first?.selectedColor ?? "#FF9500") ?? .orange
+    }
+    
+    init() {
+        
+        adCoordinator.loadAd()
     }
     
     var body: some View {
@@ -267,9 +274,13 @@ struct PomodoroTimerView: View {
     }
     
     private func toggleTimer() {
+        if(timerManager.isWorkTime == false && !userModel.subscriptionActive){
+            adCoordinator.presentAd()
+        }
         timerManager.isActive.toggle()
         UIApplication.shared.isIdleTimerDisabled = timerManager.isActive
         softHaptic.impactOccurred()
+        
     }
     
     private func resetTimer() {
