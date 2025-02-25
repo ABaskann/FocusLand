@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 import RevenueCat
 import RevenueCatUI
+import GoogleMobileAds
 
 struct PomodoroTimerView: View {
     @Environment(\.modelContext) private var modelContext
@@ -49,7 +50,7 @@ struct PomodoroTimerView: View {
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 30) {
+            VStack(spacing: 16) {
                 SessionIndicatorView(
                     currentPomodoro: timerManager.consecutiveWorkPeriods,
                     totalPomodoros: settings.first?.pomodorosBeforeLongBreak ?? 4,
@@ -181,6 +182,9 @@ struct PomodoroTimerView: View {
                     }
                 }
                 .padding(.bottom, 40)
+                if(!userModel.subscriptionActive){
+                    BannerView().frame(width: GADAdSizeBanner.size.width,height: GADAdSizeBanner.size.height).offset(y:-30)
+                }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.black)
@@ -344,5 +348,6 @@ struct PomodoroTimerView: View {
             settings.selectedColor = color.toHex() ?? "#FF9500"
         }
     }
-} 
+    
+}
 

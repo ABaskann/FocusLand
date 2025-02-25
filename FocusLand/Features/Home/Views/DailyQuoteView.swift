@@ -4,38 +4,43 @@ struct DailyQuoteView: View {
     let quote: Quote
     let accentColor: Color
     
+    var localizedTitle: String {
+        switch Locale(identifier: Locale.preferredLanguages.first!).language.languageCode?.identifier ?? "en" {
+        case "es":
+            return "Cita del Día"
+        case "fr":
+            return "Citation du Jour"
+        case "de":
+            return "Zitat des Tages"
+        default:
+            return "Daily Quote"
+        }
+    }
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Text("Daily Inspiration")
-                    .font(.headline)
-                    .foregroundColor(accentColor)
-                
-                Spacer()
-                
-                Image(systemName: "quote.bubble.fill")
-                    .foregroundColor(accentColor)
-            }
+        VStack(spacing: 12) {
+            Text(localizedTitle)
+                .font(.headline)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .foregroundColor(accentColor)
             
             Text(quote.text)
-                .font(.system(.body, design: .rounded))
-                .foregroundColor(.white)
+                .font(.body)
                 .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .foregroundColor(.white)
             
-            HStack {
-                Text("— \(quote.author)")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-                
-                Spacer()
-            }
+            Text("- \(quote.author)")
+                .font(.subheadline)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .foregroundColor(.gray)
+        }
+        .onAppear{
+            print(Locale(identifier: Locale.preferredLanguages.first!).language.languageCode?.identifier)
+            //print(Locale.current.language.languageCode?.identifier)
         }
         .padding()
         .background(Color.black.opacity(0.3))
-        .cornerRadius(15)
-        .overlay(
-            RoundedRectangle(cornerRadius: 15)
-                .stroke(accentColor.opacity(0.3), lineWidth: 1)
-        )
+        .cornerRadius(16)
     }
 } 

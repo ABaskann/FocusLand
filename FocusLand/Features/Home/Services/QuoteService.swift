@@ -14,12 +14,24 @@ class QuoteService {
     
     private func setupDailyQuoteNotification() {
         let content = UNMutableNotificationContent()
-        content.title = "Daily Inspiration"
+        
+        // Get localized strings based on user's language
+        switch Locale.current.language.languageCode?.identifier {
+        case "es":
+            content.title = "Inspiración Diaria"
+        case "fr":
+            content.title = "Inspiration Quotidienne"
+        case "de":
+            content.title = "Tägliche Inspiration"
+        default:
+            content.title = "Daily Inspiration"
+        }
+        
         content.body = Quote.getTodaysQuote().text
         content.sound = .default
         
         var dateComponents = DateComponents()
-        dateComponents.hour = 9 // Send notification at 9 AM
+        dateComponents.hour = 9
         dateComponents.minute = 0
         
         let trigger = UNCalendarNotificationTrigger(
