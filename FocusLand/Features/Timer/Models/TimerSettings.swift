@@ -36,9 +36,9 @@ class TimerSettings {
         self.selectedColor = selectedColor
         self.dailyGoalPomodoros = dailyGoalPomodoros
         self.activeDays = activeDays
-        self.isNotificationsEnabled = false
+        self.isNotificationsEnabled = true
         self.isTimerCompletionEnabled = true
-        self.isDailyReminderEnabled = false
+        self.isDailyReminderEnabled = true
         self.isDailyGoalEnabled = true
         self.isStreakEnabled = true
         self.dailyReminderTime = Calendar.current.date(from: DateComponents(hour: 9, minute: 0)) ?? Date()

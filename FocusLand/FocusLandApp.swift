@@ -19,6 +19,8 @@ struct FocusLandApp: App {
     @State private var timerManager = TimerManager()
     @State private var soundManager = SoundManager()
     @StateObject private var userViewModel = UserViewModel.shared
+    @State private var showReminderPopup = false
+    @Query private var settings: [TimerSettings]
     
     init() {
         GADMobileAds.sharedInstance().start(completionHandler: nil)
@@ -59,7 +61,37 @@ struct FocusLandApp: App {
                         print("Error fetching offerings: \(error)")
                     }
                 }
+                .onAppear {
+                    checkDailyReminder()
+                }
+                .sheet(isPresented: $showReminderPopup) {
+                    if let settings = settings.first {
+                        DailyReminderPopupView(
+                            settings: settings,
+                            accentColor: Color(hex: settings.selectedColor) ?? .orange
+                        )
+                    }
+                }
         }
         .modelContainer(container)
+    }
+    
+    private func checkDailyReminder() {
+        if let settings = settings.first, !settings.isDailyReminderEnabled {
+            // Check if we've shown the popup today
+            let lastPopupDate = UserDefaults.standard.object(forKey: "lastReminderPopupDate") as? Date
+            let calendar = Calendar.current
+            
+            if let lastDate = lastPopupDate {
+                let isToday = calendar.isDate(lastDate, inSameDayAs: Date())
+                if !isToday {
+                    showReminderPopup = true
+                    UserDefaults.standard.set(Date(), forKey: "lastReminderPopupDate")
+                }
+            } else {
+                showReminderPopup = true
+                UserDefaults.standard.set(Date(), forKey: "lastReminderPopupDate")
+            }
+        }
     }
 }

@@ -133,19 +133,7 @@ struct ProfileView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 24) {
-                    // Profile Header
-                    VStack(spacing: 8) {
-                        Image(systemName: "person.circle.fill")
-                            .font(.system(size: 80))
-                            .foregroundColor(accentColor)
-                        
-                        Text("Focus Profile")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                    }
-                    .padding(.vertical)
-                    
+                VStack() {
                     PremiumFeatureView {
                         // Goal Summary becomes premium
                         GoalsSummaryView(
@@ -155,6 +143,7 @@ struct ProfileView: View {
                         )
                     }
                     .padding(.horizontal)
+                    .padding(.top,24)
                     
                     PremiumFeatureView {
                         // Achievements section becomes premium
@@ -174,22 +163,14 @@ struct ProfileView: View {
                             }
                         }
                     }
+                    .padding(.top,24)
+                    Spacer()
                     if(!userModel.subscriptionActive){
-                        Spacer().frame(height: 32)
-                        BannerView().frame(width: GADAdSizeBanner.size.width,height: GADAdSizeBanner.size.height).offset(y:-30)
+                       
+                        BannerView().frame(width: GADAdSizeBanner.size.width,height: GADAdSizeBanner.size.height)
                     }
-                    
-                    // Additional Stats
-//                    VStack(alignment: .leading, spacing: 16) {
-//                        Text("Statistics")
-//                            .font(.title2)
-//                            .fontWeight(.bold)
-//                            .padding(.horizontal)
-//                        
-//                        // Add more stats here
-//                    }
                 }
-                .padding(.vertical)
+//                .padding(.vertical)
             }
             .background(Color.black)
 //            .navigationTitle("Profile")
